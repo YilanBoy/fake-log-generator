@@ -2,7 +2,7 @@
 
 > [!NOTE]
 >
-> This a simple project to practice Rust.
+> It's a project for me to practice Rust.
 
 This is a fake json log generator for testing purposes.
 It generates fake logs in the following format:
@@ -21,12 +21,28 @@ It generates fake logs in the following format:
 }
 ```
 
-The program will read the `connection_settings.toml` file to get the connection settings.
+> [!NOTE]
+>
+> Currently, it can only be used to send fixed-format logs.
+
+## Usage
+
+You can use the `--file` option to specify the connection settings file to read.
+
+```bash
+fake-log-generator --file ./connection_settings.toml
+```
 
 ```toml
+# connection_settings.toml example
 [host]
 protocol = "tcp"
 ip = "127.0.0.1"
 ports = [12201, 12202, 12203, 12204]
 total_requests = 10000
 ```
+
+> [!WARNING]
+>
+> The connection settings file must be in the TOML format.
+> You can find the example settings file `connection_settings.toml` in the repo.

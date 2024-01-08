@@ -1,8 +1,10 @@
+use std::env;
 use std::io::Write;
 use std::time::Instant;
 
 use rand::Rng;
 
+use crate::arguments_handler::arguments_handler;
 use crate::connection_settings::parse_connection_settings;
 use crate::fake_data_generator::generate_fake_data;
 use crate::tcp_connection::create_connections;
@@ -10,9 +12,17 @@ use crate::tcp_connection::create_connections;
 pub mod tcp_connection;
 pub mod fake_data_generator;
 mod connection_settings;
+mod arguments_handler;
 
 fn main() {
-    let content = connection_settings::read_connection_settings_file();
+    // get the command line arguments
+    let args: Vec<String> = env::args().collect();
+
+    let filename: String = arguments_handler(args);
+
+    println!("Filename is {}", filename);
+
+    let content = connection_settings::read_connection_settings_file(filename);
 
     let config = parse_connection_settings(content);
 
@@ -56,3 +66,4 @@ fn main() {
         println!("Requests per second: {}", total_requests / (before.elapsed().as_secs() as usize));
     }
 }
+

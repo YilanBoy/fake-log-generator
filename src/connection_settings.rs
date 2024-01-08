@@ -17,13 +17,11 @@ pub struct Host {
 }
 
 
-pub fn read_connection_settings_file() -> String {
-    let content = fs::read_to_string("connection_settings.toml");
+pub fn read_connection_settings_file(filename: String) -> String {
+    let content = fs::read_to_string(filename);
 
-    let content = match content {
-        Ok(content) => content,
-        Err(_) => panic!("Failed to read connection_settings.toml"),
-    };
+    let content = content.unwrap_or_else(|_| fs::read_to_string("connection_settings.toml")
+        .expect("Failed to read connection_settings.toml"));
 
     content
 }

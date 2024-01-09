@@ -15,44 +15,52 @@ mod connection_settings;
 mod arguments_handler;
 
 fn main() {
-    // get the command line arguments
-    let args: Vec<String> = env::args().collect();
+    let send_logs = || -> (usize, usize) {
+        // get the command line arguments
+        let args: Vec<String> = env::args().collect();
 
-    let filename: String = arguments_handler(args);
+        let filename: String = arguments_handler(args);
 
-    println!("Filename is {}", filename);
+        let content = connection_settings::read_connection_settings_file(filename);
 
-    let content = connection_settings::read_connection_settings_file(filename);
+        let config = parse_connection_settings(content);
 
-    let config = parse_connection_settings(content);
+        let total_requests = config.host.total_requests as usize;
 
-    let total_requests = config.host.total_requests as usize;
+        let mut streams = create_connections(
+            config.host.ip,
+            config.host.ports,
+        );
 
+        let mut rng = rand::thread_rng();
+
+        let mut total_bytes = 0;
+
+        for i in 0..total_requests {
+            let message = generate_fake_data();
+
+            // randomize which stream to write to
+            let random_index = rng.gen_range(0..streams.len());
+            streams[random_index].write(message.as_bytes()).expect("Failed to write to stream");
+
+            total_bytes += message.len();
+
+            // print every 1000 requests
+            if i % 1000 == 0 && i != 0 {
+                println!("Requests sent: {}", i);
+            }
+        }
+
+        (total_requests, total_bytes)
+    };
+
+    execute_information(send_logs);
+}
+
+fn execute_information(callback: fn() -> (usize, usize)) {
     let before = Instant::now();
 
-    let mut streams = create_connections(
-        config.host.ip,
-        config.host.ports,
-    );
-
-    let mut rng = rand::thread_rng();
-
-    let mut total_bytes = 0;
-
-    for i in 0..total_requests {
-        let message = generate_fake_data();
-
-        // randomize which stream to write to
-        let random_index = rng.gen_range(0..streams.len());
-        streams[random_index].write(message.as_bytes()).expect("Failed to write to stream");
-
-        total_bytes += message.len();
-
-        // print every 1000 requests
-        if i % 1000 == 0 && i != 0 {
-            println!("Requests sent: {}", i);
-        }
-    }
+    let (total_requests, total_bytes) = callback();
 
     // print total requests
     println!("Total requests: {}", total_requests);

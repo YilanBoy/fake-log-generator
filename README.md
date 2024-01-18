@@ -27,22 +27,11 @@ It generates fake logs in the following format:
 
 ## Usage
 
-You can use the `--file` option to specify the connection settings file to read.
+```text
+This is a simple TCP client that sends fake data to a TCP server.
 
-```bash
-fake-log-generator --file ./connection_settings.toml
+Usage:
+--host, -h <ipv4 address>. Default is 127.0.0.1
+--ports, -p <port numbers>. Default is 80
+--number, -n <number of requests>. Default is 10,000
 ```
-
-```toml
-# connection_settings.toml example
-[host]
-protocol = "tcp"
-ip = "127.0.0.1"
-ports = [12201, 12202, 12203, 12204]
-total_requests = 10000
-```
-
-> [!WARNING]
->
-> The connection settings file must be in the TOML format.
-> You can find the example settings file `connection_settings.toml` in the repo.

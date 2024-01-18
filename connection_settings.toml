@@ -1,5 +1,0 @@
-[host]
-protocol = "tcp"
-ip = "127.0.0.1"
-ports = [12201, 12202, 12203, 12204]
-total_requests = 10000

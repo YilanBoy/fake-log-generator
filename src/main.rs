@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::env;
 use std::io::Write;
 use std::net::Ipv4Addr;
@@ -8,7 +7,7 @@ use rand::Rng;
 
 pub mod tcp_connection;
 pub mod fake_data_generator;
-mod arguments;
+mod console;
 
 fn main() {
     // get the current time, used to calculate elapsed time
@@ -16,35 +15,7 @@ fn main() {
 
     let args: Vec<String> = env::args().collect();
 
-    let args_hashmap: HashMap<String, String> = arguments::handler(args);
-
-    let host: Ipv4Addr = args_hashmap.get("host")
-        .unwrap()
-        .parse::<Ipv4Addr>()
-        .unwrap();
-
-    // change args.get("port") from string to Vec<u16>
-    let ports: Vec<u16> = args_hashmap.get("ports")
-        .unwrap()
-        .split(",")
-        .map(|port| {
-            let port = port.parse::<u16>().unwrap();
-
-            // port must be between 1 and 65535
-            // u16 max value is 65535, we don't have to check for that
-            if port < 1 {
-                println!("Port {} is not valid", port);
-                std::process::exit(1);
-            }
-
-            port
-        })
-        .collect();
-
-    let total_requests: usize = args_hashmap.get("number")
-        .unwrap()
-        .parse::<usize>()
-        .unwrap();
+    let (host, ports, total_requests) = console::handler(args);
 
     let total_bytes = send_logs(host, ports, total_requests);
 
